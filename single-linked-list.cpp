@@ -1,3 +1,4 @@
+
 #include <iostream>
 
 using namespace std;
@@ -8,59 +9,32 @@ struct stNode{
     stNode *m_pNext;
 };
 
-class SingleList{
+class SingleLinkedList{
 private:
-    stNode *m_pHead;
-    int m_nSize;
+    stNode *m_pHead;  
     
-    void deleteAll();
 public:
     
-    SingleList():m_pHead(NULL),m_nSize(0){ }
-    ~SingleList();
+    SingleLinkedList():m_pHead(NULL){ }
+    ~SingleLinkedList();
     
     void insert(int data);
     void addAtBegin(int data);
-    void addAtPos(int data, int pos);
-    void addAtPosWithoutSize(int data, int pos);    
-    void print();
-    void reverse();
-    void eraseAll();
-    int size();
-    
+    void addAtPos(int data, int pos);       
+    void deleteFirstNode();
+    void deleteLastNode(); 
+    void deleteAtPos(int pos);      
+    void deleteAll();   
+    void print(); 
 };
 
-SingleList::~SingleList(){    
-    deleteAll();
-}
-
-void SingleList::eraseAll(){
-    deleteAll();
-}
-
-void SingleList::deleteAll()
-{
-    while(m_pHead != NULL){
-        stNode *pNode = m_pHead;
-        m_pHead = m_pHead->m_pNext;
-        delete pNode;
-        m_nSize--;
-    }
-}
-
-int SingleList::size()
-{
-    return m_nSize;
-}
-
-void SingleList::insert(int data){
+void SingleLinkedList::insert(int data){
     
     //if list empty
     if(m_pHead == NULL){
         m_pHead = new stNode();
         m_pHead->data = data;
-        m_pHead->m_pNext = NULL;
-        m_nSize++;
+        m_pHead->m_pNext = NULL;        
     }
     else
     {
@@ -77,14 +51,11 @@ void SingleList::insert(int data){
         pNode->m_pNext = NULL;
         
         //attached new node at end
-        pTempNode->m_pNext = pNode;    
-        m_nSize++;
-                
-    }
-    
+        pTempNode->m_pNext = pNode;                    
+    }    
 }
 
-void SingleList::addAtBegin(int data)
+void SingleLinkedList::addAtBegin(int data)
 {
     // create node and attach to head
     stNode *pNode = new stNode();
@@ -92,90 +63,175 @@ void SingleList::addAtBegin(int data)
     pNode->m_pNext = m_pHead;
     
     //reset head
-    m_pHead = pNode;
-    m_nSize++;
+    m_pHead = pNode;           
+}
+
+void SingleLinkedList::addAtPos(int data, int pos)
+{
+    //if pos < 0 
+    if(pos <= 0)
+    {
+        cout<<"invalid position"<<endl;
+    }
+    else if((m_pHead == NULL) || (pos == 1))
+    {
+        // create node and attach to head
+        stNode *pNode = new stNode();
+        pNode->data = data;
+        pNode->m_pNext = m_pHead;
+    
+        //reset head
+        m_pHead = pNode;
+    }
+    else
+    {
+        stNode *pTemp = m_pHead;
+        stNode *pPrev = NULL;
+        int counter = 1;
+        
+        // iterate till specific position and maintain prev. node
+        while((pTemp != NULL) && (counter <= (pos - 1)))
+        {
+            //maintain prev. node
+            pPrev = pTemp;
+            pTemp = pTemp->m_pNext;
+            counter++;
+        }
+        // if position beyound the list or not found
+        if(pTemp == NULL)
+        {
+            cout<<"Position doesn't exist adding at last position"<<endl;
+            stNode *p = new stNode();
+            p->data = data;
+            p->m_pNext = NULL;
             
-}
-
-void SingleList::addAtPos(int data, int pos)
-{
-    //if pos < 0 
-    if(pos < 0)
-    {
-        cout<<"invalid position"<<endl;
-    }
-    else if(pos == 0)
-    {
-        addAtBegin(data);
-    }
-    else if(pos > m_nSize)
-    {
-        cout<<"insert at end"<<endl;
-        insert(data);
-    }
-    else
-    {
-        //iterate list to position
-        int counter = 0;
-        stNode *pNode = m_pHead;
-        
-        while( counter < (pos - 1)){
-            pNode = pNode->m_pNext;
-            counter++;
+            pPrev->m_pNext = p;
         }
-        
-        //create node
-        stNode *p = new stNode();
-        p->data = data;
-        p->m_pNext = pNode->m_pNext;   // 1 2 3-> data 5->  6    
-        pNode->m_pNext = p; // 3 -> 5
-        m_nSize++;
+        else
+        {
+            //create node
+            stNode *p = new stNode();
+            p->data = data;
+            p->m_pNext = pTemp;
+            
+            pPrev->m_pNext = p;
+        } 
     }
 }
 
-void SingleList::addAtPosWithoutSize(int data, int pos)
+void SingleLinkedList::deleteFirstNode()
 {
-    //if pos < 0 
-    if(pos < 0)
+    if(m_pHead != NULL)
     {
-        cout<<"invalid position"<<endl;
-    }
-    else if(pos == 0)
-    {
-        addAtBegin(data);
+        stNode *pNext = m_pHead;
+        m_pHead = m_pHead->m_pNext;        
+        delete pNext;        
     }
     else
     {
-        stNode *pTempNode = m_pHead;
-        int counter = 0;
-        
-        while(pTempNode->m_pNext != NULL)
+        cout<<"list is empty"<<endl;
+    }
+}
+
+void SingleLinkedList::deleteLastNode()
+{
+    // if list is empty
+    if(m_pHead == NULL)
+    {
+        cout<<"list is empty"<<endl;
+    }
+    else
+    {
+        // if the list has only one element
+        if(m_pHead->m_pNext == NULL)
         {
-            if(counter == (pos - 1))
+            delete m_pHead;
+            m_pHead = NULL;
+        }
+        else
+        {
+            stNode *pTemp = m_pHead;
+            stNode *pPrev = NULL;
+            
+            //iterate list till end and maintain previous node
+            while(pTemp->m_pNext != NULL)
             {
-                stNode*pNode = new stNode();
-                pNode->data = data;
-                pNode->m_pNext = pTempNode->m_pNext;
-                pTempNode->m_pNext = pNode;
-                break;
-            }
-            pTempNode = pTempNode->m_pNext;
-            counter++;
+                //maintain previous node
+                pPrev = pTemp;
+                pTemp = pTemp->m_pNext;
+            }            
+            //update previous node link to NULL
+            pPrev->m_pNext = NULL;            
+            //delete last node
+            delete pTemp;
         }
-        
-        if(pTempNode->m_pNext == NULL)
+    } 
+}
+
+void SingleLinkedList::deleteAtPos(int pos)
+{
+    // if the list is empty
+    if(m_pHead == NULL)
+    {
+        cout<<"list is empty"<<endl;
+    }
+    else
+    {
+        //if pos < 0 
+        if(pos <= 0)
         {
-            stNode*pNode = new stNode();
-            pNode->data = data;
-            pNode->m_pNext = NULL;
-            pTempNode->m_pNext = pNode;
+            cout<<"invalid position"<<endl;
         }
-        
-        
+        else if(pos == 1) // if first node
+        {
+            //deleteFirstNode();
+            stNode *pNext = m_pHead;
+            m_pHead = m_pHead->m_pNext;        
+            delete pNext;
+        }
+        else
+        {
+            stNode *pTemp = m_pHead;
+            stNode *pPrev = NULL;
+            int counter = 1;
+            // iterate till specific position and maintain prev. node
+            while((pTemp != NULL) && (counter <= (pos - 1)))
+            {
+                //maintain prev. node
+                pPrev = pTemp;
+                pTemp = pTemp->m_pNext;
+                counter++;
+            }
+            // if position beyound the list or not found
+            if(pTemp == NULL)
+            {
+                cout<<"Position doesn't exist"<<endl;
+            }
+            else
+            {
+                //link prev. node to the next node which we want to delete
+                pPrev->m_pNext = pTemp->m_pNext;
+                //delete node
+                delete pTemp;
+            }        
+        }
     }
 }
 
-void SingleList::print()
+void SingleLinkedList::deleteAll()
+{
+    while(m_pHead != NULL){
+        stNode *pNode = m_pHead;
+        m_pHead = m_pHead->m_pNext;
+        delete pNode;        
+    }
+}
+
+SingleLinkedList::~SingleLinkedList(){    
+    deleteAll();
+}
+
+void SingleLinkedList::print()
 {
     stNode *pNode = m_pHead;
     
@@ -185,44 +241,23 @@ void SingleList::print()
     }
 }
 
-void SingleList::reverse()
-{
-    stNode *pCurr = m_pHead;
-    stNode *pPrev = NULL;
-    
-    while( pCurr != NULL)
-    {
-        stNode *pNext = pCurr->m_pNext;
-        pCurr->m_pNext = pPrev;
-        pPrev = pCurr;
-        pCurr = pNext;
-    }
-    
-    m_pHead = pPrev;
-}
-
 int main(int argc, char** argv) {
     
-    SingleList l1;
+    SingleLinkedList l1;
     l1.insert(10);
     l1.insert(20);
     l1.insert(30);
     l1.insert(40);
     l1.insert(50);
     l1.addAtBegin(0);
-    l1.addAtPos(25,3);
-    l1.addAtPosWithoutSize(25,5);
+    l1.addAtPos(25,7);    
+    l1.print();    
+    cout<<"===================="<<endl;    
+    //l1.deleteAll();    
+    //l1.deleteFirstNode();
+    //l1.deleteLastNode();
+    //l1.deleteAtPos(2);
     l1.print();
-    cout<<"===================="<<endl;
-    l1.reverse();
-    l1.print();
-    cout<<"===================="<<endl;
-    l1.reverse();
-    l1.print();
-    cout<<"===================="<<endl;
-    
-    l1.eraseAll();
-    cout<<l1.size();
     
     return 0;
 }
